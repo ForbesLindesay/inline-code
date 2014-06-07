@@ -1,6 +1,8 @@
 # inline-code
 
-A library to help you inline code in JavaScript
+A library to help you inline code in JavaScript.  It automatically handles arguments that contain references to `this` or arguments that are complex and get used multiple times in the inlined function.  This makes it really simple to use.  It also supports using temporary variables in inline functions.  If you start a variable with an `_` it will be automatically defined for you and guaranteed not to conflict with the user's program.  This is super useful.
+
+If you return "expressions" they will be inlined perfectly.  If you return "statements" it will be assumed that the statements should replace whatever the next statement up in the tree is.  See the Array.prototype.slice.call inliner for an example of this.
 
 [![Build Status](https://img.shields.io/travis/ForbesLindesay/inline-code/master.svg)](https://travis-ci.org/ForbesLindesay/inline-code)
 [![Dependency Status](https://img.shields.io/gemnasium/ForbesLindesay/inline-code.svg)](https://gemnasium.com/ForbesLindesay/inline-code)
@@ -22,6 +24,15 @@ var foo = require('foo');
 exports.second = foo.mastermind('first value', 'second value');
 exports.arr = foo.arrayify('a0', 'b1', 'c2', 'd3');
 exports.max = max(10, 5);
+function sumFast() {
+  var args = Array.prototype.slice.call(arguments);
+  return args.reduce(function (a, b) { return a + b; }, 0);
+}
+function sumSlow() {
+  return Array.prototype.slice.call(arguments).reduce(function (a, b) { return a + b; }, 0);
+}
+exports.sumFast = sumFast;
+exports.sumSlow = sumSlow;
 ```
 
 build.js
@@ -39,6 +50,37 @@ fs.writeFileSync(__dirname + '/output.js', replace(fs.readFileSync(__dirname + '
     },
     max: function (args) {
       return 'Math.max($args)';
+    },
+    Array: {
+      prototype: {
+        slice: {
+          call: function (args, stack) {
+            var start = false;
+            var name = null;
+            if (stack[stack.length - 2].TYPE === 'Assign' &&
+                stack[stack.length - 3].TYPE === 'SimpleStatement' &&
+                stack[stack.length - 2].left.TYPE === 'SymbolRef' &&
+                stack[stack.length - 2].operator === '=') {
+              name = stack[stack.length - 2].left.name;
+              start = name + ' = [];';
+            }
+            if (stack[stack.length - 2].TYPE === 'VarDef' &&
+                stack[stack.length - 3].TYPE === 'Var' &&
+                stack[stack.length - 3].definitions.length === 1) {
+              name = stack[stack.length - 2].name.name;
+              start = 'var ' + name + ' = [];';
+            }
+            if (start) {
+              return start +
+                'for (var _i = 0; _i < $args[0].length; _i++) {' +
+                name + '.push($args[0][_i])' +
+                '}';
+            }
+            // only inline when it can be done as a simple statement, e.g.
+            // var args = Array.prototype.slice(arguments);
+          }
+        }
+      }
     }
   },
   requires: {
@@ -69,6 +111,26 @@ exports.second = "first value" + "." + "second value";
 exports.arr = [ "a0", "b1", "c2", "d3", "end" ];
 
 exports.max = Math.max(10, 5);
+
+function sumFast() {
+    var args = [];
+    for (var _i_0 = 0; _i_0 < arguments.length; _i_0++) {
+        args.push(arguments[_i_0]);
+    }
+    return args.reduce(function(a, b) {
+        return a + b;
+    }, 0);
+}
+
+function sumSlow() {
+    return Array.prototype.slice.call(arguments).reduce(function(a, b) {
+        return a + b;
+    }, 0);
+}
+
+exports.sumFast = sumFast;
+
+exports.sumSlow = sumSlow;
 ```
 
 ## License
