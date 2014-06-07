@@ -16,8 +16,8 @@ var PRIMATIVES = [
   'SymbolRef'
 ];
 
-function isPrimative(node) {
-  return (node.TYPE === 'Dot' && isPrimative(node.expression)) || PRIMATIVES.indexOf(node.TYPE) !== -1;
+function isPrimitive(node) {
+  return (node.TYPE === 'Dot' && isPrimitive(node.expression)) || PRIMATIVES.indexOf(node.TYPE) !== -1;
 }
 function needsThis(node) {
   var needsThis = false;
@@ -112,7 +112,7 @@ function replaceCalls(src, replacements) {
   ast = ast.transform(new uglify.TreeTransformer(null, function (node) {
     if (node.TYPE === 'Call' || node.TYPE === 'New') {
       var fn = getFn(node.expression, node.TYPE);
-      if (fn) {
+      if (typeof fn === 'function') {
         var args = node.args;
         var res = fn(args, this.stack);
         if (typeof res !== 'string') return;
@@ -162,8 +162,8 @@ function replaceCalls(src, replacements) {
         var temporaryVariables = [];
         var temporaryVariableCache = {};
         for (var i = 0; i < args.length; i++) {
-          if ((argumentCounts[i] > 1 && !isPrimative(args[i])) ||
-              (argumentCounts[i] > 0 && !isPrimative(args[i]) && argumentUsedInLoop[i]) ||
+          if ((argumentCounts[i] > 1 && !isPrimitive(args[i])) ||
+              (argumentCounts[i] > 0 && !isPrimitive(args[i]) && argumentUsedInLoop[i]) ||
               (argumentCounts[i] > 0 && argumentUsedInScope[i] && needsThis(args[i]))) {
             var argname = temporaryVariable('_arg_' + i);
             assignments.push(new uglify.AST_Assign({
