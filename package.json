@@ -1,6 +1,6 @@
 {
   "name": "inline-code",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A library to help you inline code in JavaScript",
   "keywords": [],
   "dependencies": {
