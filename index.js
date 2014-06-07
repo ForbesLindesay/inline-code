@@ -133,7 +133,9 @@ function replaceCalls(src, replacements) {
           });
           var hasScopeContainer = parents.indexOf('Function') !== -1 || parents.indexOf('Defun') !== -1;
           var hasLoopContainer = parents.indexOf('Do') !== -1 || parents.indexOf('For') !== -1 ||
-              parents.indexOf('For') || parents.indexOf('ForIn') || parents.indexOf('With');
+              parents.indexOf('For') !== -1 || parents.indexOf('ForIn') !== -1 ||
+              parents.indexOf('While') !== -1 || parents.indexOf('Function') !== -1 ||
+              parents.indexOf('Defun') !== -1;
           var property = null;
           switch (node.TYPE) {
             case 'Call':
