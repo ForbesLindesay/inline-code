@@ -5,7 +5,7 @@ A library to help you inline code in JavaScript.  It automatically handles argum
 If you return "expressions" they will be inlined perfectly.  If you return "statements" it will be assumed that the statements should replace whatever the next statement up in the tree is.  See the Array.prototype.slice.call inliner for an example of this.
 
 [![Build Status](https://img.shields.io/travis/ForbesLindesay/inline-code/master.svg)](https://travis-ci.org/ForbesLindesay/inline-code)
-[![Dependency Status](https://img.shields.io/gemnasium/ForbesLindesay/inline-code.svg)](https://gemnasium.com/ForbesLindesay/inline-code)
+[![Dependency Status](https://img.shields.io/david/ForbesLindesay/inline-code.svg)](https://david-dm.org/ForbesLindesay/inline-code)
 [![NPM version](https://img.shields.io/npm/v/inline-code.svg)](https://www.npmjs.org/package/inline-code)
 
 ## Installation
