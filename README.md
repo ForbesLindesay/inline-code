@@ -1,5 +1,7 @@
 # inline-code
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ForbesLindesay/inline-code.svg)](https://greenkeeper.io/)
+
 A library to help you inline code in JavaScript.  It automatically handles arguments that contain references to `this` or arguments that are complex and get used multiple times in the inlined function.  This makes it really simple to use.  It also supports using temporary variables in inline functions.  If you start a variable with an `_` it will be automatically defined for you and guaranteed not to conflict with the user's program.  This is super useful.
 
 If you return "expressions" they will be inlined perfectly.  If you return "statements" it will be assumed that the statements should replace whatever the next statement up in the tree is.  See the Array.prototype.slice.call inliner for an example of this.
